@@ -14,12 +14,3 @@ provider "aws" {
   profile = "default"
   region  = "us-west-2"
 }
-
-#Resource to create s3 bucket
-resource "aws_s3_bucket" "joannas-bucket-test"{
-  bucket = "joannas-bucket-test"
-
-  tags = {
-    Name = "S3Bucket"
-  }
-}
