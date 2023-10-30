@@ -1,48 +1,45 @@
-# Security Groups
-resource "aws_security_group" "joanna_sg_http" {
-  vpc_id = aws_vpc.joanna_vpc.id
-  name   = "joanna_security_group"
-  tags = {
-    Name = "joanna_sg_http"
+# Create a Security Group
+resource "aws_security_group" "allow_web_traffic" {
+  name        = "allow_web_traffic"
+  description = "Allow web traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  # Add inbound rules
+  # Add a rule for HTTP
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-}
 
-# Ingress Security Port 80 (Inbound)
-resource "aws_security_group_rule" "joanna_ingress_http" {
-  from_port         = 80
-  protocol          = "tcp"
-  security_group_id = aws_security_group.joanna_sg_http.id
-  to_port           = 80
-  type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"] # <Specify the CIDR> instead of allowing it to public
-}
+  # Add a rule for HTTPS
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-# Ingress Security Port 443 (Inbound)
-resource "aws_security_group_rule" "joanna_ingress_https" {
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.joanna_sg_http.id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"] # <Specify the CIDR> instead of allowing it to public
-}
+  # Add a rule for SSH
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-# Ingress Security Port 22 (Inbound)
-resource "aws_security_group_rule" "joanna_ingress_ssh" {
-  from_port         = 22
-  protocol          = "tcp"
-  security_group_id = aws_security_group.joanna_sg_http.id
-  to_port           = 22
-  type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"] # <Specify the CIDR> instead of allowing it to public
-}
-
-# Allow Access All (Outbound)
-resource "aws_security_group_rule" "joanna_outbound_all" {
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.joanna_sg_http.id
-  to_port           = 0
-  type              = "egress"
-  cidr_blocks       = ["0.0.0.0/0"]
+  # Add an outbound rule
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "allow-web-traffic"
+  }
 }
