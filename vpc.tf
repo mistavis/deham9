@@ -1,86 +1,87 @@
 # Create a Virtual Private Cloud with CIDR 10.0.0.0/16 in the region us-west-2
-resource "aws_vpc" "joanna_vpc" {
+resource "aws_vpc" "vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = "joanna_vpc"
+    Name = "vpc"
   }
 }
 
-# Public Subnet 1
-resource "aws_subnet" "public_subnet_1" {
-  vpc_id                  = aws_vpc.joanna_vpc.id
+# Create Public Subnet 1 in the AZ us-west-2a
+resource "aws_subnet" "public-subnet-1" {
+  vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.1.0/24" # 256 IPs
-  availability_zone       = "us-west-2a"  # Replace with desired AZ
+  availability_zone       = "us-west-2a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public_subnet_1"
+    Name = "public-subnet-1"
   }
 }
 
-# Private Subnet 1
-resource "aws_subnet" "private_subnet_1" {
-  vpc_id                  = aws_vpc.joanna_vpc.id
+# Create Private Subnet 1 in the AZ us-west-2a
+resource "aws_subnet" "private-subnet-1" {
+  vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.2.0/24" # 256 IPs
-  availability_zone       = "us-west-2a"  # Replace with desired AZ
+  availability_zone       = "us-west-2a"
   map_public_ip_on_launch = false
   tags = {
-    Name = "private_subnet_1"
+    Name = "private-subnet-1"
   }
 }
 
-resource "aws_subnet" "public_subnet_2" {
-  vpc_id                  = aws_vpc.joanna_vpc.id
+# Create Public Subnet 2 in the AZ us-west-2b
+resource "aws_subnet" "public-subnet-2" {
+  vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.3.0/24"
-  availability_zone       = "us-west-2b" # Replace with desired AZ
+  availability_zone       = "us-west-2b"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public_subnet_2"
+    Name = "public-subnet-2"
   }
 }
 
-resource "aws_subnet" "private_subnet_2" {
-  vpc_id                  = aws_vpc.joanna_vpc.id
+# Create Private Subnet 2 in the AZ us-west-2b
+resource "aws_subnet" "private-subnet-2" {
+  vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.4.0/24"
-  availability_zone       = "us-west-2b" # Replace with desired AZ
+  availability_zone       = "us-west-2b"
   map_public_ip_on_launch = false
   tags = {
-    Name = "private_subnet_2"
+    Name = "private-subnet-2"
   }
 }
 
-# Internet Gateway - to have Internet traffic in public subnets
-resource "aws_internet_gateway" "joanna_igw" {
-  vpc_id = aws_vpc.joanna_vpc.id
+# Create an Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "joanna_igw"
+    Name = "igw"
   }
 }
 
-# Routing tables
-# Provides a resource to create a VPC routing table
-resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.joanna_vpc.id
+# Create a Route Table
+resource "aws_route_table" "route-table" {
+  vpc_id = aws_vpc.vpc.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.joanna_igw.id
+    gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name = "public_route_table"
+    Name = "route-table"
   }
 }
 
-# Provides a resource to create an association between a Public Route Table and a Public Subnet
-resource "aws_route_table_association" "public_subnet_1_association" {
-  route_table_id = aws_route_table.public_route_table.id
-  subnet_id      = aws_subnet.public_subnet_1.id
-  depends_on     = [aws_route_table.public_route_table, aws_subnet.public_subnet_1]
+# Create an association between the Route Table and the Public Subnets
+resource "aws_route_table_association" "rta-1" {
+  route_table_id = aws_route_table.route-table.id
+  subnet_id      = aws_subnet.public-subnet-1.id
+  depends_on     = [aws_route_table.route-table, aws_subnet.public-subnet-1]
 }
 
-resource "aws_route_table_association" "public_subnet_2_association" {
-  route_table_id = aws_route_table.public_route_table.id
-  subnet_id      = aws_subnet.public_subnet_2.id
-  depends_on     = [aws_route_table.public_route_table, aws_subnet.public_subnet_2]
+resource "aws_route_table_association" "rta-2" {
+  route_table_id = aws_route_table.route-table.id
+  subnet_id      = aws_subnet.public-subnet-2.id
+  depends_on     = [aws_route_table.route-table, aws_subnet.public-subnet-2]
 
 }
