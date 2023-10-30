@@ -38,3 +38,6 @@ terraform.rc
 
 # Ignore plan files (sensitive data)
 plan.*
+
+# Ignore instance details file
+all_instance_details
