@@ -2,8 +2,8 @@
 ### Create an EC2 instance
 
 resource "aws_instance" "server" {
-  ami                         = "ami-09100e341bda441c0"
-  instance_type               = "t3.micro"
+  ami                         = var.amis[var.aws_region]
+  instance_type               = var.instance_type
   associate_public_ip_address = true
   key_name                    = "vockey"
   vpc_security_group_ids      = [aws_security_group.allow_web_traffic.id]

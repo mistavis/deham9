@@ -1,16 +1,21 @@
-# Create a Virtual Private Cloud with CIDR 10.0.0.0/16 in the region us-west-2
+# Create a VPC
+
+data "aws_availability_zones" "available" {}
+
 resource "aws_vpc" "vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support   = true
   tags = {
     Name = "vpc"
   }
 }
 
-# Create Public Subnet 1 in the AZ us-west-2a
+# Create Public Subnet 1
 resource "aws_subnet" "public-subnet-1" {
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = "10.0.1.0/24" # 256 IPs
-  availability_zone       = "us-west-2a"
+  cidr_block              = var.public_cidr_1
+  availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = true
 
   tags = {
@@ -18,22 +23,22 @@ resource "aws_subnet" "public-subnet-1" {
   }
 }
 
-# Create Private Subnet 1 in the AZ us-west-2a
+# Create Private Subnet 1
 resource "aws_subnet" "private-subnet-1" {
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = "10.0.2.0/24" # 256 IPs
-  availability_zone       = "us-west-2a"
+  cidr_block              = var.private_cidr_1
+  availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = false
   tags = {
     Name = "private-subnet-1"
   }
 }
 
-# Create Public Subnet 2 in the AZ us-west-2b
+# Create Public Subnet 2
 resource "aws_subnet" "public-subnet-2" {
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = "10.0.3.0/24"
-  availability_zone       = "us-west-2b"
+  cidr_block              = var.public_cidr_2
+  availability_zone       = data.aws_availability_zones.available.names[2]
   map_public_ip_on_launch = true
 
   tags = {
@@ -41,11 +46,11 @@ resource "aws_subnet" "public-subnet-2" {
   }
 }
 
-# Create Private Subnet 2 in the AZ us-west-2b
+# Create Private Subnet 2
 resource "aws_subnet" "private-subnet-2" {
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = "10.0.4.0/24"
-  availability_zone       = "us-west-2b"
+  cidr_block              = var.private_cidr_2
+  availability_zone       = data.aws_availability_zones.available.names[2]
   map_public_ip_on_launch = false
   tags = {
     Name = "private-subnet-2"
@@ -64,7 +69,7 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_route_table" "route-table" {
   vpc_id = aws_vpc.vpc.id
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.cidr_blocks
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
