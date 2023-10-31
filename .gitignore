@@ -41,3 +41,6 @@ plan.*
 
 # Ignore instance details file
 all_instance_details
+
+# Ignore tracing logs
+terraform-trace.log
