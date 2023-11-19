@@ -39,8 +39,8 @@ terraform.rc
 # Ignore plan files (sensitive data)
 plan.*
 
-# Ignore instance details file
-all_instance_details
+# Ignore output files
+metadata
 
 # Ignore tracing logs
 terraform-trace.log
